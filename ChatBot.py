@@ -1,5 +1,5 @@
 from langchain_openai import ChatOpenAI
-from chatbot import VectorStore
+from RAGChatbot import VectorStore
 
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains import create_history_aware_retriever
