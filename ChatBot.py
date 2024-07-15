@@ -86,7 +86,7 @@ class ChatBot:
 
 
     def __del__(self):
-        VectorStore.deleteVectorStore(self.__id)
+        VectorStore.deleteLocalVectorStore(self.__id)
 
 
     def __get_session_history(self, _):
