@@ -11,6 +11,9 @@ from langchain_community.vectorstores.utils import filter_complex_metadata
 import boto3
 from time import sleep
 
+retryTimes = 3
+
+
 debugMode = False
 __bucket = None
 __S3 = None
@@ -110,7 +113,7 @@ def checkS3VectorStoreFor(id: str) -> bool:
     """
     __checkS3init()
     
-    for retry in range(3):
+    for retry in range(retryTimes):
         try:
             res = __S3.list_objects(Bucket=__bucket_name, Prefix=f"vectorstores/{id}" )
             if 'Contents' not in res:
@@ -135,7 +138,7 @@ def deleteS3VectorstoreFor(id: str) -> bool:
     """
     __checkS3init()
     
-    for retry in range(3):
+    for retry in range(retryTimes):
         try:
             res = __S3.list_objects(Bucket=__bucket_name, Prefix=f"vectorstores/{id}" )
             if 'Contents' not in res:
@@ -234,7 +237,7 @@ def __downloadS3VectorstoreFor(id: str) -> bool:
     
     deleteLocalVectorStore(id)
     
-    for retry in range(3):
+    for retry in range(retryTimes):
         try:
             res = __S3.list_objects(Bucket=__bucket_name, Prefix=f"vectorstores/{id}" )
             if 'Contents' not in res:
@@ -282,7 +285,7 @@ def __upload_file(id, file_name, father=None) -> bool:
     file_name = f"./vectorStore/{id}/{father}/{file_name}" if father else f"./vectorStore/{id}/{file_name}"
     debug(f"Uploading {file_name} to {path}")
     
-    for retry in range(3):
+    for retry in range(retryTimes):
         try:
             __bucket.upload_file(file_name, path)
             return True
