@@ -13,7 +13,7 @@ from langchain_community.chat_message_histories import ChatMessageHistory
 
 llm = ChatOpenAI(model="gpt-3.5-turbo-0125")
 
-__contextualize_q_system_prompt = (
+contextualize_q_system_prompt = (
     "Given a chat history and the latest user question "
     "which might reference context in the chat history, "
     "formulate a standalone question which can be understood "
@@ -21,7 +21,7 @@ __contextualize_q_system_prompt = (
     "just reformulate it if needed and otherwise return it as is."
 )
 
-__system_prompt = (
+system_prompt = (
     "You are an assistant for question-answering tasks. "
     "Use the following pieces of retrieved context to answer "
     "the question. If you don't know the answer, say that you "
@@ -31,24 +31,24 @@ __system_prompt = (
     "{context}"
 )
 
-__contextualize_q_prompt = ChatPromptTemplate.from_messages(
+contextualize_q_prompt = ChatPromptTemplate.from_messages(
     [
-        ("system", __contextualize_q_system_prompt),
+        ("system", contextualize_q_system_prompt),
         MessagesPlaceholder("chat_history"),
         ("human", "{input}"),
     ]
 )
 
-__qa_prompt = ChatPromptTemplate.from_messages(
+qa_prompt = ChatPromptTemplate.from_messages(
     [
-        ("system", __system_prompt),
+        ("system", system_prompt),
         MessagesPlaceholder("chat_history"),
         ("human", "{input}"),
     ]
 )
 
 
-__question_answer_chain = create_stuff_documents_chain(llm, __qa_prompt)
+question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)
 
 
 class ChatBot:
@@ -70,11 +70,11 @@ class ChatBot:
             search_type="similarity", search_kwargs={"k": 15}
         )
         self.__history_aware_retriever = create_history_aware_retriever(
-            llm, self.__retriever, __contextualize_q_prompt
+            llm, self.__retriever, contextualize_q_prompt
         )
         self.history = None
         self.__rag_chain = create_retrieval_chain(
-            self.__history_aware_retriever, __question_answer_chain
+            self.__history_aware_retriever, question_answer_chain
         )
         self.__conversational_rag_chain = RunnableWithMessageHistory(
             self.__rag_chain,
@@ -105,7 +105,7 @@ class ChatBot:
             Returns:
                 str: The answer provided by the chatbot.
             """
-            return self.__conversational_rag_chain.stream(
+            return self.__conversational_rag_chain.invoke(
                 {
                 "input": question,},
                 config={

@@ -77,9 +77,9 @@ def buildS3VectorStoreFor(id: str) -> bool:
     """
     __buildLocalVectorStoreFor(id)
     if __uploadS3VectorstoreFor(id):
-        __deleteLocalVectorStore(id)
+        deleteLocalVectorStore(id)
         return True
-    __deleteLocalVectorStore(id)
+    deleteLocalVectorStore(id)
     return False
 
 
@@ -198,7 +198,7 @@ def __getLocalVectorStoreFor(id: str) -> Chroma:
         return None
 
 
-def __deleteLocalVectorStore(id: str) -> bool:
+def deleteLocalVectorStore(id: str) -> bool:
     """
     Deletes the local vector store with the given ID.
 
@@ -232,7 +232,7 @@ def __downloadS3VectorstoreFor(id: str) -> bool:
     """
     __checkS3init()
     
-    __deleteLocalVectorStore(id)
+    deleteLocalVectorStore(id)
     
     for retry in range(3):
         try:
@@ -257,7 +257,7 @@ def __downloadS3VectorstoreFor(id: str) -> bool:
             debug("Retrying...")
             sleep(3)
     debug("Failed to download vectorstore, deleting local copy")
-    __deleteLocalVectorStore(id)
+    deleteLocalVectorStore(id)
     return False
 
 
@@ -319,7 +319,7 @@ def __uploadS3VectorstoreFor(id: str, path=None, father=None) -> bool:
                 debug(f"Failed to upload {file_name}, causing the whole vectorstore to fail")
                 debug(f"Deleting vectorstore {id} for both local and S3 storage")
                 deleteS3VectorstoreFor(id)
-                __deleteLocalVectorStore(id)
+                deleteLocalVectorStore(id)
                 return False
     return True
 
