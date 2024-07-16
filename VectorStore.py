@@ -237,6 +237,9 @@ def __downloadS3VectorstoreFor(id: str) -> bool:
     
     deleteLocalVectorStore(id)
     
+    if not os.path.exists(f"./vectorStore/{id}"):
+        os.mkdir(f"./vectorStore/{id}")
+    
     for retry in range(retryTimes):
         try:
             res = __S3.list_objects(Bucket=__bucket_name, Prefix=f"vectorstores/{id}" )
@@ -248,9 +251,8 @@ def __downloadS3VectorstoreFor(id: str) -> bool:
                 file_name = key.split("/")[-1]
                 father = "/".join(key.split("/")[2:-1])
                 if father:
-                    os.system(f"mkdir -p ./vectorStore/{id}/{father}")
-                else:
-                    os.system(f"mkdir -p ./vectorStore/{id}")
+                    if not os.path.exists(f"./vectorStore/{id}/{father}"):
+                        os.mkdir(f"./vectorStore/{id}/{father}")
                 debug(f"Downloading {file_name} from {key}")
                 __bucket.download_file(key, f"./vectorStore/{id}/{father}/{file_name}")
             return True
